@@ -1,17 +1,22 @@
-import React from 'react';
-import { render } from 'react-dom';
-import Hello from './Hello';
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+import MuiThemeProvider from "material-ui/styles/MuiThemeProvider";
+import getMuiTheme from "material-ui/styles/getMuiTheme";
 
-const styles = {
-  fontFamily: 'sans-serif',
-  textAlign: 'center',
+const muiTheme = getMuiTheme({
+  datePicker: {
+    selectColor: "#5C67E1"
+  },
+  flatButton: { primaryTextColor: "#5C67E1" }
+});
+
+const Root = () => {
+  return (
+    <MuiThemeProvider muiTheme={getMuiTheme(muiTheme)}>
+      <App />
+    </MuiThemeProvider>
+  );
 };
 
-const App = () => (
-  <div style={styles}>
-    <Hello name="CodeSandbox" />
-    <h2>Start editing to see some magic happen {'\u2728'}</h2>
-  </div>
-);
-
-render(<App />, document.getElementById('root'));
+ReactDOM.render(<Root />, document.getElementById("root"));
