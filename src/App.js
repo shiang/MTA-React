@@ -1,6 +1,5 @@
 import React from "react";
-import Start from "./Start";
-import Destination from "./Destination";
+import Dropdown from "./Dropdown";
 import RaisedButton from "material-ui/RaisedButton";
 
 export const subWay = [
@@ -45,7 +44,13 @@ class App extends React.Component {
       stationIndex: 0,
       station: "Time Square"
     },
-    result: ""
+    result: null,
+    travelThru: null,
+    stations: null,
+    changeAt: null,
+    continueAt: null,
+    totalStops: null,
+    startDisplay: false
   };
 
   getStopsOnDiffLines = (fromLine, fromStation, toLine, toStation) => {
@@ -121,11 +126,13 @@ class App extends React.Component {
 
     //Otherwise, just console.log the message telling user his/her travel information
     this.setState({
-      result: `You must travel through the following stops on the ${fromLine} line: ${travelStationsOnFrom.join(
+      result: `You must travel through the following stops on the ${fromLine} line: `,
+      travelThru: `${travelStationsOnFrom.join(", ")}.`,
+      changeAt: `Change at Union Square.`,
+      continueAt: `Your journey continues through the following stops: ${travelStationsOnTo.join(
         ", "
-      )}. Change at Union Square. Your journey continues through the following stops: ${travelStationsOnTo.join(
-        ", "
-      )}. ${travelStationsOnFrom.length +
+      )}.`,
+      totalStops: `${travelStationsOnFrom.length +
         travelStationsOnTo.length} stops in total.`
     });
   };
@@ -150,6 +157,13 @@ class App extends React.Component {
       return;
     }
 
+    if (fromStation === toStation) {
+      this.setState({
+        result: `Just go home..`
+      });
+      return;
+    }
+
     //Checking the direction you are travelling to (from left to right in the array or the other way around)
     //If travelling from left to right in the stops array
     if (
@@ -162,9 +176,9 @@ class App extends React.Component {
       );
       //Console log the travel info
       this.setState({
-        result: `You must travel through the following stops on the ${line} line: ${travelStations.join(
-          ", "
-        )}. Total of ${travelStations.length} stops.`
+        result: `You must travel through the following stops on the ${line} line: `,
+        travelThru: `${travelStations.join(", ")}.`,
+        totalStops: `Total of ${travelStations.length} stops.`
       });
     } else {
       //If travelling from right to left in the stops array
@@ -176,9 +190,9 @@ class App extends React.Component {
 
       //console log the travelStations array in the reverse order
       this.setState({
-        result: `You must travel through the following stops on the ${line} line: ${travelStations
-          .reverse()
-          .join(", ")}. Total of ${travelStations.length} stops.`
+        result: `You must travel through the following stops on the ${line} line: `,
+        travelThru: `${travelStations.reverse().join(", ")}.`,
+        totalStops: `Total of ${travelStations.length} stops.`
       });
     }
   };
@@ -200,6 +214,10 @@ class App extends React.Component {
       toLine.line,
       toStation.station
     );
+
+    this.setState({
+      startDisplay: true
+    });
   };
 
   setFromLine = fromLineIndex => {
@@ -238,19 +256,47 @@ class App extends React.Component {
     });
   };
 
+  resetDisplay = () => {
+    this.setState({
+      startDisplay: false
+    });
+  };
+
+  delayReset = () => {
+    setTimeout(this.resetDisplay, 10000);
+  };
+
   render() {
     return (
       <SubwayContext.Provider value={subWay}>
         <div style={style.main}>
-          <Start setFromLine={this.setFromLine} setFromSta={this.setFromSta} />
-          <Destination setToLine={this.setToLine} setToSta={this.setToSta} />
+          <h2>From: </h2>
+          <Dropdown
+            name="start"
+            setFromLine={this.setFromLine}
+            setFromSta={this.setFromSta}
+          />
+          <h2>To: </h2>
+          <Dropdown
+            name="destination"
+            setToLine={this.setToLine}
+            setToSta={this.setToSta}
+          />
           <RaisedButton
             label="Check route"
             primary={true}
             onClick={this.checkRoute}
             style={{ margin: "12px" }}
           />
-          <p>{this.state.result}</p>
+          
+              <div style={style.main}>
+                <p>{this.state.result}</p>
+                <p>{this.state.travelThru}</p>
+                {this.state.changeAt && <p>{this.state.changeAt}</p>}
+                {this.state.continueAt && <p>{this.state.continueAt}</p>}
+                {this.state.totalStops && <p>{this.state.totalStops}</p>}
+              </div>
+            
         </div>
       </SubwayContext.Provider>
     );
